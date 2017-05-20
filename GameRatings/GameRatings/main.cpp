@@ -3,14 +3,91 @@
 #include <string>
 #include <vector>
 #include <sstream>
-#include "videogame.h"
-#include "string_utils.h"
-using namespace VideoGames;
+#include <algorithm>
+#include "../Lib/Sort/sortall.h"
+#include "../Lib/Sort/comparer.h"
 using namespace std;
+
+struct VideoGame {
+    float           Rating;
+    int             RatingsCount;
+    std::string     Name;
+    std::string     Publisher;
+};
 
 bool FileExists(const std::string& fileName) {
     std::ifstream infile(fileName);
     return infile.good();
+}
+
+string Trim(const string& s) {
+    string result = s;
+    size_t p = result.find_first_not_of(" \t");
+    if (string::npos != p) {
+        result.erase(0, p);
+    }
+    p = result.find_last_not_of(" \t");
+    if (string::npos != p) {
+        result.erase(p + 1);
+    }
+    return result;
+}
+
+string ToUpper(const string& s) {
+    string result = s;
+    std::transform(result.begin(), result.end(), result.begin(), ::toupper);
+    return result;
+}
+
+bool VideoGameNameMatches(const VideoGame& game, const string name) {
+    return ToUpper(Trim(game.Name)) == ToUpper(Trim(name));
+}
+
+bool VideoGameExists(const vector<VideoGame>& videoGames, const string gameName) {
+    for (size_t i = 0; i < videoGames.size(); i++) {
+        if (VideoGameNameMatches(videoGames[i], gameName)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void AddVideoGame(std::vector<VideoGame>& videoGames, const std::string& gameName, const std::string& publisherName, float rating) {
+    VideoGame newGame;
+    newGame.Name = ToUpper(gameName);
+    newGame.Publisher = publisherName;
+    newGame.Rating = rating;
+    newGame.RatingsCount = 0;
+    videoGames.push_back(newGame);
+}
+
+void AddVideoGameRating(std::vector<VideoGame>& videoGames, const std::string& gameName, float rating) {
+    for (size_t i = 0; i < videoGames.size(); i++) {
+        if (VideoGameNameMatches(videoGames[i], gameName)) {
+            videoGames[i].RatingsCount = videoGames[i].RatingsCount + 1;
+            videoGames[i].Rating = videoGames[i].Rating + (rating - videoGames[i].Rating) / videoGames[i].RatingsCount;
+            return;
+        }
+    }
+}
+
+struct DescendingRatingCompare {
+
+    int compare(const VideoGame& game1, const VideoGame& game2) const {
+        if (game1.Rating > game2.Rating) {
+            return -1;
+        }
+        else if (game1.Rating < game2.Rating) {
+            return 1;
+        }
+        else {
+            return 0;
+        }
+    }
+};
+
+void SortByRating(vector<VideoGame>& videoGames) {
+    QuickSort(videoGames, videoGames.size(), DescendingRatingCompare());
 }
 
 string ReadInputFileName(const std::string& fileType) {
@@ -34,18 +111,28 @@ string ReadOutputFileName() {
     return outputFileName;
 }
 
+string RemoveExtraSpaces(const string &sentence) {
+    stringstream sstream;
+    string str, newoutput;
+    sstream << sentence;
+    while (sstream >> str) {
+        newoutput += (str + ' ');
+    }
+    return newoutput.substr(0, newoutput.length() - 1);
+}
+
 void ReadPublishersFile(const string& publisherFileName, vector<VideoGame>& videoGames) {
     string line;
     ifstream publishersFile(publisherFileName);
     while (std::getline(publishersFile, line)) {
         int iDelimiter = line.find_first_of(';');
         string publisherName = line.substr(0, iDelimiter);
-        publisherName = StringUtils::Trim(publisherName);
+        publisherName = Trim(publisherName);
         string gameName = line.substr(iDelimiter+1);
-        gameName = StringUtils::RemoveExtraSpaces(gameName);
-        gameName = StringUtils::Trim(gameName);
-        if (!VideoGames::VideoGameExists(videoGames, gameName)) {
-            VideoGames::AddVideoGame(videoGames, gameName, publisherName, 0);
+        gameName = RemoveExtraSpaces(gameName);
+        gameName = Trim(gameName);
+        if (!VideoGameExists(videoGames, gameName)) {
+            AddVideoGame(videoGames, gameName, publisherName, 0);
         }
     }
 }
@@ -62,12 +149,12 @@ void ReadRatingsFile(const string& ratingsFileName, vector<VideoGame>& videoGame
         while (ssLine >> word) {
             gameName += (word + ' ');
         }
-        gameName = StringUtils::Trim(gameName);
-        if (!VideoGames::VideoGameExists(videoGames, gameName)) {
-            VideoGames::AddVideoGame(videoGames, gameName, "", rating);
+        gameName = Trim(gameName);
+        if (!VideoGameExists(videoGames, gameName)) {
+            AddVideoGame(videoGames, gameName, "", rating);
         }
         else {
-            VideoGames::AddVideoGameRating(videoGames, gameName, rating);
+            AddVideoGameRating(videoGames, gameName, rating);
         }
     }
 }
@@ -89,7 +176,7 @@ void main() {
         vector<VideoGame> videoGames;
         ReadPublishersFile(publisherFileName, videoGames);
         ReadRatingsFile(ratingsFileName, videoGames);
-        VideoGames::SortByRating(videoGames);
+        SortByRating(videoGames);
         WriteToOutputFile(outputFileName, videoGames);
         system("PAUSE");
     }

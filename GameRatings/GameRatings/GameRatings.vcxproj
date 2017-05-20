@@ -112,12 +112,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="string_utils.cpp" />
-    <ClCompile Include="videogame.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="string_utils.h" />
-    <ClInclude Include="videogame.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

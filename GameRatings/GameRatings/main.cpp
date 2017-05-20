@@ -57,7 +57,6 @@ void ReadRatingsFile(const string& ratingsFileName, vector<VideoGame>& videoGame
         float rating;
         stringstream ssLine(line);
         ssLine >> rating;
-        cout << rating << endl;
         string gameName;
         string word;
         while (ssLine >> word) {
@@ -82,6 +81,7 @@ void main() {
         ReadPublishersFile(publisherFileName, videoGames);
         ReadRatingsFile(ratingsFileName, videoGames);
         VideoGames::SortByRating(videoGames);
+        //WriteToOutputFile();
         system("PAUSE");
     }
     catch (exception ex) {

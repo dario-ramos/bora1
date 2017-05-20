@@ -19,7 +19,7 @@ bool VideoGames::VideoGameExists(const vector<VideoGame>& videoGames, const stri
 
 void VideoGames::AddVideoGame(std::vector<VideoGame>& videoGames, const std::string& gameName, const std::string& publisherName, float rating) {
     VideoGame newGame;
-    newGame.Name = gameName;
+    newGame.Name = StringUtils::ToUpper(gameName);
     newGame.Publisher = publisherName;
     newGame.Rating = rating;
     newGame.RatingsCount = 0;

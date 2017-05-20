@@ -72,16 +72,24 @@ void ReadRatingsFile(const string& ratingsFileName, vector<VideoGame>& videoGame
     }
 }
 
+void WriteToOutputFile(const string& outputFileName, vector<VideoGame>& videoGames) {
+    std::ofstream output(outputFileName, std::ofstream::trunc);
+    output << "RANK,NAME,DIRECTOR,POINTS" << endl;
+    for (size_t i = 0; i < videoGames.size(); i++) {
+        output << i+1 << ", " << videoGames[i].Name << ", " << videoGames[i].Publisher << ", " << videoGames[i].Rating << endl;
+    }
+}
+
 void main() {
     try {
         string publisherFileName = "publishers.txt";//ReadInputFileName("Publisher");
         string ratingsFileName = "ratings.txt";//ReadInputFileName("Ratings");
-        string outputFileName = "outputs.txt";//ReadOutputFileName();
+        string outputFileName = "output.txt";//ReadOutputFileName();
         vector<VideoGame> videoGames;
         ReadPublishersFile(publisherFileName, videoGames);
         ReadRatingsFile(ratingsFileName, videoGames);
         VideoGames::SortByRating(videoGames);
-        //WriteToOutputFile();
+        WriteToOutputFile(outputFileName, videoGames);
         system("PAUSE");
     }
     catch (exception ex) {

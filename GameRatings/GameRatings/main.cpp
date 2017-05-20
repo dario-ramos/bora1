@@ -78,13 +78,14 @@ void WriteToOutputFile(const string& outputFileName, vector<VideoGame>& videoGam
     for (size_t i = 0; i < videoGames.size(); i++) {
         output << i+1 << ", " << videoGames[i].Name << ", " << videoGames[i].Publisher << ", " << videoGames[i].Rating << endl;
     }
+    cout << "Results are in the file: " << outputFileName << endl;
 }
 
 void main() {
     try {
-        string publisherFileName = "publishers.txt";//ReadInputFileName("Publisher");
-        string ratingsFileName = "ratings.txt";//ReadInputFileName("Ratings");
-        string outputFileName = "output.txt";//ReadOutputFileName();
+        string publisherFileName = ReadInputFileName("Publisher");
+        string ratingsFileName = ReadInputFileName("Ratings");
+        string outputFileName = ReadOutputFileName();
         vector<VideoGame> videoGames;
         ReadPublishersFile(publisherFileName, videoGames);
         ReadRatingsFile(ratingsFileName, videoGames);
